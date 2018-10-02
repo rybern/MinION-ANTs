@@ -1,0 +1,22 @@
+Blacklisted sequences:
+EcoRI, GAATTC
+EcoRV, GATATC
+SalI, GTCGAC
+SmaI, CCCGGG
+XmaI, CCCGGG
+HindIII, AAGCTT
+BbsI, GAAGAC
+XhoI, CTCGAG
+BgII, GCCNNNNNGGC
+
+Max homopolymers length: 3
+Batch code minimum Hamming distance = 2
+Target code minimum Hamming distance = 2
+Maximum homopolymer length = 4
+GC content = 35% to 65%
+Batch code length = 20
+Linker length = 2
+Target code length = 28
+Number of batch codes = 30000
+Number of target codes = 33334
+
