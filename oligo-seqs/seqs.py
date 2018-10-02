@@ -40,7 +40,7 @@ def validKMer(kmer):
     ])
 
 validKMers = list(filter(validKMer, allKMers(8)))
-validKMers.sort(key = lambda s: cycle_count(list(filter(lambda c: c not in ANTs, s))), reverse = True)
+validKMers.sort(key = cycle_count_ANT, reverse = True)
 
 def generateValidSeqs(barcodes, kmers):
     kmix = 0
@@ -65,6 +65,8 @@ def writeOut():
     validSeqs = generateValidSeqs(barcodes, validKMers)
 
     if len(sys.argv) > 1:
+        cycle_score_statistics(validSeqs)
+
         output_file = sys.argv[1]
         with open(output_file, 'w') as f:
             for seq in validSeqs:
