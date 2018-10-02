@@ -1,8 +1,9 @@
 import itertools
 import sys
 from functools import reduce
+from barcode_filtering import *
 
-NNTs = "GATC"
+NNTs = "ACGT"
 ANTs = "X"
 NTs = NNTs + ANTs
 
@@ -11,7 +12,7 @@ NTs = NNTs + ANTs
 PCR_prefix = "GTTCAGAGTTCTACAGTCCGACGATC"
 PCR_suffix = "TGGAATTCTCGGGTGCCAAGG"
 
-barcodes_file = "barcodes.txt"
+barcodes_file = "barcodes_sorted.txt"
 barcodes = []
 with open(barcodes_file) as f:
     barcodes = f.read().splitlines()
@@ -39,6 +40,7 @@ def validKMer(kmer):
     ])
 
 validKMers = list(filter(validKMer, allKMers(8)))
+validKMers.sort(key = lambda s: cycle_count(list(filter(lambda c: c not in ANTs, s))), reverse = True)
 
 def generateValidSeqs(barcodes, kmers):
     kmix = 0
