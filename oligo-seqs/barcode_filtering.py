@@ -16,9 +16,6 @@ def cycle_count(seq_, n=5):
     #print()
     return total
 
-def cycle_count_ANT(seq):
-    return cycle_count(filter(lambda c: c in NNTs, seq))
-
 test = cycle_count("AAAATGCA", 4) == 17
 
 def sort_barcode_file(barcode_out, barcode_in = "barcodes27-2.txt"):
@@ -86,8 +83,8 @@ def cycle_score_statistics_stops(seqs):
     print("Stop after barcode: " + str(score_prefix_stop))
     print("No stops: " + str(max(score_no_stop)))
 
-def cycle_score_statistics(seqs):
-    scores = [cycle_count_ANT(seq) for seq in seqs]
+def cycle_score_statistics(seqs, n=5):
+    scores = [cycle_count(seq, n=n) for seq in seqs]
     scores.sort()
 
     print("Oligo cycle score statistics:")

@@ -80,7 +80,7 @@ def writeOut(output_file = None):
 
     if output_file:
         cycle_score_statistics_stops(seqs)
-        cycle_score_statistics(codes)
+        cycle_score_statistics(codes, n=4)
 
         with open(output_file, 'w') as f:
             for seq in seqs:
