@@ -14,7 +14,7 @@ PCR_suffix = "TGGAATTCTCGGGTGCCAAGG"
 
 suffix_count_adjustment = 21 - cycle_count(PCR_suffix)
 
-barcodes_file = "barcodes27-2-sorted.txt"
+barcodes_file = "barcodes27-2-sorted2.txt"
 barcodes = []
 with open(barcodes_file) as f:
     barcodes = f.read().splitlines()
@@ -63,23 +63,30 @@ def generateValidSeqs(barcodes, kmers):
     if kmix < len(kmers) - 1:
         print("DID NOT FIND ENOUGH BARCODES TO PAIR WITH KMERS")
 
-def writeOut():
+def writeOut(output_file = None):
     validSeqs = list(generateValidSeqs(barcodes, validKMers))
 
     seqs = [p[0] for p in validSeqs]
     codes = [p[1] for p in validSeqs]
     print (len(seqs), len(codes))
 
+    # Stop after payload and barcode: 197
+    # Stop after payload: 235
+    # Stop after barcode: 153
+    # No stops: 204
+
     if len(sys.argv) > 1:
-        cycle_score_statistics(seqs, adj = suffix_count_adjustment)
+        output_file = sys.argv[0]
+
+    if output_file:
+        cycle_score_statistics_stops(seqs)
         cycle_score_statistics(codes)
 
-        output_file = sys.argv[1]
         with open(output_file, 'w') as f:
             for seq in seqs:
                 f.write(seq + '\n')
     else:
-        for seq in validSeqs:
+        for seq in seqs:
             print(seq + '\n')
 
 if __name__ == "__main__":
