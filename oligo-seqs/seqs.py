@@ -42,7 +42,7 @@ def validKMer(kmer):
     ])
 
 validKMers = list(filter(validKMer, allKMers(8)))
-validKMers.sort(key = cycle_count_ANT, reverse = True)
+validKMers.sort(key = cycle_count, reverse = True)
 
 def generateValidSeqs(barcodes, kmers):
     kmix = 0
@@ -76,7 +76,7 @@ def writeOut(output_file = None):
     # No stops: 204
 
     if len(sys.argv) > 1:
-        output_file = sys.argv[0]
+        output_file = sys.argv[1]
 
     if output_file:
         cycle_score_statistics_stops(seqs)

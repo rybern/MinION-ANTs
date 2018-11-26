@@ -61,10 +61,11 @@ def cycle_score_statistics_stops(seqs):
         barcode_scores.append(cycle_count(barcode, 4))
 
         payload = seq[prefix_len+barcode_len:prefix_len+barcode_len+payload_len]
-        payload_scores.append(cycle_count(barcode, 5))
+        payload_scores.append(cycle_count(payload, 5))
 
     # stop after payload and barcode
     score_all_stop = suffix_len + max(payload_scores) + max(barcode_scores) + prefix_len
+    print(suffix_len, max(payload_scores), max(barcode_scores), prefix_len)
 
     # don't stop, everything at 5
     score_no_stop = [suffix_len + s for s in payload_barcode_prefix_scores]
