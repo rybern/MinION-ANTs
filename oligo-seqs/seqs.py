@@ -1,7 +1,7 @@
 import itertools
 import sys
 from functools import reduce
-from barcode_filtering import *
+from cycle_counting import *
 
 NNTs = "ACGT"
 ANTs = "X"
@@ -16,7 +16,7 @@ infix = "CAAGCAGAAGACGGCATACGAGAT"
 
 suffix_count_adjustment = 21 - cycle_count(PCR_suffix)
 
-barcodes_file = "barcodes27-2-sorted2.txt"
+barcodes_file = "barcodes_2indel_27.txt"
 barcodes = []
 with open(barcodes_file) as f:
     barcodes = f.read().splitlines()
