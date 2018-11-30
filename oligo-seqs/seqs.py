@@ -64,6 +64,7 @@ def generateValidSeqs(barcodes, kmers):
         print("DID NOT FIND ENOUGH BARCODES TO PAIR WITH KMERS")
 
 def writeOut(output_file = None):
+    cycle_score_statistics(barcodes, n=4)
     validSeqs = list(generateValidSeqs(barcodes, validKMers))
 
     seqs = [p[0] for p in validSeqs]
@@ -74,6 +75,7 @@ def writeOut(output_file = None):
     # Stop after payload: 235
     # Stop after barcode: 153
     # No stops: 204
+
 
     if len(sys.argv) > 1:
         output_file = sys.argv[1]

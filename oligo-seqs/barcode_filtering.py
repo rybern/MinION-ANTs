@@ -30,7 +30,7 @@ def sort_barcode_file(barcode_out, barcode_in = "barcodes27-2.txt"):
 
 def cycle_score_statistics_stops(seqs):
     prefix_len = 26
-    barcode_len = 26
+    barcode_len = 27
     payload_len = 8
     suffix_len = 21
 
