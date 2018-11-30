@@ -43,7 +43,8 @@ def validKMer(kmer):
         longest_run(infix[-2:] + kmer + PCR_suffix[:2]) <= 3
     ])
 
-validKMers = list(filter(validKMer, allKMers(8)))
+k = 8
+validKMers = list(filter(validKMer, allKMers(k)))
 validKMers.sort(key = cycle_count, reverse = True)
 
 def generateValidSeqs(barcodes, kmers):
@@ -82,7 +83,19 @@ def writeOut(output_file = None):
         output_file = sys.argv[1]
 
     if output_file:
-        cycle_score_statistics_stops(seqs)
+        regions = [ # :: [(Length, CycleCount)]
+            # prefix
+            ( len(PCR_prefix), 1 ),
+            # barcode
+            ( 27, 4 ),
+            # infix
+            ( len(infix), 1 ),
+            # payload
+            ( k, 5 ),
+            # suffix
+            ( len(PCR_suffix), 1 ),
+        ]
+        cycle_score_statistics_stops(regions, seqs)
         #cycle_score_statistics(codes, n=4)
 
         with open(output_file, 'w') as f:

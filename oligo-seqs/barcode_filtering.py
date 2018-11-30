@@ -45,19 +45,7 @@ def cycle_region(seq, region):
 def cycles_partitions(seq, regions, partition):
     return (cycle_region(seq, join_regions(regions, ixs)) for ixs in partition)
 
-def cycle_score_statistics_stops(seqs):
-    regions = [ # :: [(Length, CycleCount)]
-        # prefix
-        ( 26, 1 ),
-        # barcode
-        ( 27, 4 ),
-        # infix
-        ( 24, 1 ),
-        # payload
-        ( 8, 5 ),
-        # suffix
-        ( 21, 1 ),
-        ]
+def cycle_score_statistics_stops(regions, seqs):
 
     strategies = [
         [ [0], [1], [2], [3], [4] ],
@@ -97,7 +85,7 @@ def cycle_score_statistics_stops(seqs):
     ]
 
     print(header)
-    for line, total, score in zip(lines, totalScores, maxScores):
+    for line, total, score in zip(lines, total_scores, max_scores):
         print (line.format(*score) + str(total))
 
     return
