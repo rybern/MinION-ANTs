@@ -71,7 +71,6 @@ def writeOut(output_file = None):
 
     seqs = [p[0] for p in validSeqs]
     codes = [p[1] for p in validSeqs]
-    print (len(seqs), len(codes))
 
     # Stop after payload and barcode: 197
     # Stop after payload: 235

@@ -10,10 +10,8 @@ def cycle_count(seq_, n=5):
     prev = NNTs[n-1]
     for nt in seq:
         score = cycle_score(prev, nt, n=n)
-        #print(score, end=' ')
         total += score
         prev = nt
-    #print()
     return total
 
 test = cycle_count("AAAATGCA", 4) == 17
@@ -72,29 +70,30 @@ def cycle_score_statistics_stops(seqs):
         [ [0 ,  1 ,  2 ,  3], [4] ]
     ]
 
-    scores = [[] for _ in strategies]
+    parts = {tuple(part):[] for strategy in strategies for part in strategy}
 
     i = 0
-    for seq in seqs[:100]:
+    for seq in seqs:
         i += 1
         if(i % 10000 == 0):
-            print("done " + str(i) + "\t/" + str(len(seqs)))
+            print(str(i) + "\t/" + str(len(seqs)))
 
-        for score, partition in zip(scores, strategies):
-            score.append(cycles_partitions(seq, regions, partition))
+        for part, scores in parts.items():
+            scores.append(cycle_region(seq, join_regions(regions, part)))
 
-    maxScores = [list(map(max, zip(*score))) for score in scores]
-    totalScores = [sum(score) for score in maxScores]
+    part_maxes = {key: max(val) for key, val in parts.items()}
+    max_scores = [[part_maxes[tuple(part)] for part in strategy] for strategy in strategies]
+    total_scores = [sum(score) for score in max_scores]
 
     header = "  PCR_PREFIX | BARCODE  |  INFIX  | PAYLOAD | PCR_SUFFIX"
-    lines = [" [{: 6d}    ] [{: 6d}  ] [{: 6d} ] [{: 6d} ] [ {: 6d}  ]:  ",
-             " [{: 6d}    ] [{: 6d}  ] [       {: 6d}    ] [ {: 6d}  ]:  ",
-             " [{: 6d}    ] [     {: 6d}       ] [{: 6d} ] [ {: 6d}  ]:  ",
-             " [{: 6d}    ] [            {: 6d}          ] [ {: 6d}  ]:  ",
-             " [        {: 6d}       ] [{: 6d} ] [{: 6d} ] [ {: 6d}  ]:  ",
-             " [        {: 6d}       ] [       {: 6d}    ] [ {: 6d}  ]:  ",
-             " [              {: 6d}        ]    [{: 6d} ] [ {: 6d}  ]:  ",
-             " [                    {: 6d}               ] [ {: 6d}  ]:  ",
+    lines = [" [{: 6d}    ]+[{: 6d}  ]+[{: 6d} ]+[{: 6d} ]+[ {: 6d}  ] = ",
+             " [{: 6d}    ]+[{: 6d}  ]+[       {: 6d}    ]+[ {: 6d}  ] = ",
+             " [{: 6d}    ]+[     {: 6d}       ]+[{: 6d} ]+[ {: 6d}  ] = ",
+             " [{: 6d}    ]+[            {: 6d}          ]+[ {: 6d}  ] = ",
+             " [        {: 6d}       ]+[{: 6d} ]+[{: 6d} ]+[ {: 6d}  ] = ",
+             " [        {: 6d}       ]+[       {: 6d}    ]+[ {: 6d}  ] = ",
+             " [            {: 6d}             ]+[{: 6d} ]+[ {: 6d}  ] = ",
+             " [                {: 6d}                   ]+[ {: 6d}  ] = ",
     ]
 
     print(header)
