@@ -28,61 +28,80 @@ def sort_barcode_file(barcode_out, barcode_in = "barcodes27-2.txt"):
     with open(barcode_out, "w") as f:
         f.writelines(map(lambda s: s + "\n", lines))
 
+def join_regions(regions, ixs):
+    using_regions = [regions[ix] for ix in ixs]
+
+    start = sum(region[0] for region in regions[:ixs[0]])
+    end =   start + sum(region[0] for region in using_regions)
+    cycle = max(region[1] for region in using_regions)
+
+    return (start, end, cycle)
+
+def cycle_region(seq, region):
+    (start, end, cycle) = region
+    if cycle == 1:
+        return end - start
+    else:
+        return cycle_count(seq[start : end], cycle)
+
+def cycles_partitions(seq, regions, partition):
+    return (cycle_region(seq, join_regions(regions, ixs)) for ixs in partition)
+
 def cycle_score_statistics_stops(seqs):
-    prefix_len = 26
-    barcode_len = 27
-    payload_len = 8
-    suffix_len = 21
+    regions = [ # :: [(Length, CycleCount)]
+        # prefix
+        ( 26, 1 ),
+        # barcode
+        ( 27, 4 ),
+        # infix
+        ( 24, 1 ),
+        # payload
+        ( 8, 5 ),
+        # suffix
+        ( 21, 1 ),
+        ]
 
-    payload_barcode_scores = []
-    payload_barcode_prefix_scores = []
-    barcode_prefix_scores = []
-    barcode_scores = []
-    payload_scores = []
+    strategies = [
+        [ [0], [1], [2], [3], [4] ],
+        [ [0], [1], [2 ,  3], [4] ],
+        [ [0], [1 ,  2], [3], [4] ],
+        [ [0], [1 ,  2 ,  3], [4] ],
+        [ [0 ,  1], [2], [3], [4] ],
+        [ [0 ,  1], [2 ,  3], [4] ],
+        [ [0 ,  1 ,  2], [3], [4] ],
+        [ [0 ,  1 ,  2 ,  3], [4] ]
+    ]
 
-    print("total seqs: " + str(len(seqs)))
+    scores = [[] for _ in strategies]
+
     i = 0
-
-    for seq in seqs:
+    for seq in seqs[:100]:
         i += 1
         if(i % 10000 == 0):
-            print("progress " + str(i))
+            print("done " + str(i) + "\t/" + str(len(seqs)))
 
-        barcode_prefix = seq[:prefix_len+barcode_len]
-        barcode_prefix_scores.append(cycle_count(barcode_prefix, 4))
+        for score, partition in zip(scores, strategies):
+            score.append(cycles_partitions(seq, regions, partition))
 
-        payload_barcode_prefix = seq[:prefix_len+barcode_len+payload_len]
-        payload_barcode_prefix_scores.append(cycle_count(payload_barcode_prefix, 5))
+    maxScores = [list(map(max, zip(*score))) for score in scores]
+    totalScores = [sum(score) for score in maxScores]
 
-        payload_barcode = seq[prefix_len:prefix_len+barcode_len+payload_len]
-        payload_barcode_scores.append(cycle_count(payload_barcode, 5))
+    header = "  PCR_PREFIX | BARCODE  |  INFIX  | PAYLOAD | PCR_SUFFIX"
+    lines = [" [{: 6d}    ] [{: 6d}  ] [{: 6d} ] [{: 6d} ] [ {: 6d}  ]:  ",
+             " [{: 6d}    ] [{: 6d}  ] [       {: 6d}    ] [ {: 6d}  ]:  ",
+             " [{: 6d}    ] [     {: 6d}       ] [{: 6d} ] [ {: 6d}  ]:  ",
+             " [{: 6d}    ] [            {: 6d}          ] [ {: 6d}  ]:  ",
+             " [        {: 6d}       ] [{: 6d} ] [{: 6d} ] [ {: 6d}  ]:  ",
+             " [        {: 6d}       ] [       {: 6d}    ] [ {: 6d}  ]:  ",
+             " [              {: 6d}        ]    [{: 6d} ] [ {: 6d}  ]:  ",
+             " [                    {: 6d}               ] [ {: 6d}  ]:  ",
+    ]
 
-        barcode = seq[prefix_len:prefix_len+barcode_len]
-        barcode_scores.append(cycle_count(barcode, 4))
+    print(header)
+    for line, total, score in zip(lines, totalScores, maxScores):
+        print (line.format(*score) + str(total))
 
-        payload = seq[prefix_len+barcode_len:prefix_len+barcode_len+payload_len]
-        payload_scores.append(cycle_count(payload, 5))
-
-    # stop after payload and barcode
-    score_all_stop = suffix_len + max(payload_scores) + max(barcode_scores) + prefix_len
-    print(suffix_len, max(payload_scores), max(barcode_scores), prefix_len)
-
-    # don't stop, everything at 5
-    score_no_stop = [suffix_len + s for s in payload_barcode_prefix_scores]
-
-    # stop after barcode
-    score_prefix_stop = suffix_len + max(payload_barcode_scores) + prefix_len
-
-    # stop after payload, then do barcode and prefix at 4
-    constant = suffix_len + max(payload_scores)
-    print(str(len(barcode_prefix_scores)))
-    print(str(barcode_prefix_scores[0]))
-    score_payload_stop = [constant + s for s in barcode_prefix_scores]
-
-    print("Stop after payload and barcode: " + str(score_all_stop))
-    print("Stop after payload: " + str(max(score_payload_stop)))
-    print("Stop after barcode: " + str(score_prefix_stop))
-    print("No stops: " + str(max(score_no_stop)))
+    return
 
 def cycle_score_statistics(seqs, n=5):
     scores = [cycle_count(seq, n=n) for seq in seqs]
