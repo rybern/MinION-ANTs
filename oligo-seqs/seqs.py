@@ -12,7 +12,7 @@ NTs = NNTs + ANTs
 PCR_prefix = "GTTCAGAGTTCTACAGTCCGACGATC"
 PCR_suffix = "TGGAATTCTCGGGTGCCAAGG"
 
-infix = "CAAGCAGAAGACGGCATACGAGAT"
+infix = "ACACTCTTTCCCTACACGACGCTCTTCCGATCT"
 
 suffix_count_adjustment = 21 - cycle_count(PCR_suffix)
 
