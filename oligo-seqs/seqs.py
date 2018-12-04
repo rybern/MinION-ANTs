@@ -16,7 +16,8 @@ infix = "ACACTCTTTCCCTACACGACGCTCTTCCGATCT"
 
 suffix_count_adjustment = 21 - cycle_count(PCR_suffix)
 
-barcodes_file = "barcodes_2indel_27.txt"
+#barcodes_file = "barcodes_2indel_27.txt"
+barcodes_file = "test_barcodes_sorted27.txt"
 barcodes = []
 with open(barcodes_file) as f:
     barcodes = f.read().splitlines()
@@ -66,12 +67,28 @@ def generateValidSeqs(barcodes, kmers):
     if kmix < len(kmers) - 1:
         print("DID NOT FIND ENOUGH BARCODES TO PAIR WITH KMERS")
 
+def to_NNT_seqs(input_file, output_file):
+    nnt_ix = 0
+    with open(output_file, "w+") as outF:
+        with open(input_file) as inF:
+            for seq in inF:
+                run = longest_run(seq)
+                test_seq = ""
+                while True:
+                    test_seq = seq.replace("X", NNTs[nnt_ix])
+                    nnt_ix = (nnt_ix + 1) % 4
+                    if longest_run(test_seq) <= run:
+                        break
+                outF.write(test_seq)
+
+
 def writeOut(output_file = None):
-    #cycle_score_statistics(barcodes, n=4)
+    cycle_score_statistics(filter(lambda b: longest_run(b) <= 3, barcodes), n=4)
     validSeqs = list(generateValidSeqs(barcodes, validKMers))
 
     seqs = [p[0] for p in validSeqs]
     codes = [p[1] for p in validSeqs]
+    cycle_score_statistics(codes, n=4)
 
     # Stop after payload and barcode: 197
     # Stop after payload: 235
